@@ -1,0 +1,101 @@
+import heapq
+
+grafo = {"S": {"N": 5, "C": 2},
+     "N": {"S": 5, "B": 4, "Q": 4},
+    "B": {"N": 4, "C": 1, "I": 3, "D": 5},
+    "C": {"S": 2, "B": 1, "D": 8, "E": 10, "P": 21},
+    "I": {"B": 3, "F": 7},
+    "Q": {"N": 4, "O": 7},
+    "D": {"B": 5, "F": 7, "O": 13, "T": 6, "E": 2},
+     "F": {"I": 7, "D": 7, "P": 12},
+    "O": {"Q": 7, "D": 13},
+    "T": {"D": 6, "E": 2, "J": 9},
+    "E": {"D": 2, "T": 2, "C": 10, "L": 7},
+    "P": {"C": 21, "F": 12},
+    "J": {"T": 9},
+    "L": {"E": 7}}
+
+
+def dijkstra(grafo, origen):
+    distancias = {nodo: float("inf") for nodo in grafo}
+    distancias[origen] = 0
+
+    anteriores = {nodo: None for nodo in grafo}
+    cola = [(0, origen)]
+
+    while cola:
+        distancia_actual, nodo_actual = heapq.heappop(cola)
+
+        if distancia_actual > distancias[nodo_actual]:
+            continue
+
+        for vecino, peso in grafo[nodo_actual].items():
+            nueva_distancia = distancia_actual + peso
+
+            if nueva_distancia < distancias[vecino]:
+                distancias[vecino] = nueva_distancia
+                anteriores[vecino] = nodo_actual
+                heapq.heappush(cola, (nueva_distancia, vecino))
+
+    return distancias, anteriores
+
+
+def obtener_ruta(anteriores, destino):
+    ruta = []
+
+    while destino is not None:
+        ruta.append(destino)
+        destino = anteriores[destino]
+
+    ruta.reverse()
+    return ruta
+
+
+posicion = "S"
+coste_total = 0
+
+
+distancias, anteriores = dijkstra(grafo, posicion)
+ruta = obtener_ruta(anteriores, "F")
+
+print("S -> F")
+print("Ruta:", ruta)
+print("Coste:", distancias["F"])
+
+coste_total += distancias["F"]
+posicion = "F"
+
+
+distancias, anteriores = dijkstra(grafo, posicion)
+ruta = obtener_ruta(anteriores, "E")
+
+print("\nF -> E")
+print("Ruta:", ruta)
+print("Coste:", distancias["E"])
+
+coste_total += distancias["E"]
+posicion = "E"
+
+
+distancias, anteriores = dijkstra(grafo, posicion)
+ruta = obtener_ruta(anteriores, "T")
+
+print("\nE -> T")
+print("Ruta:", ruta)
+print("Coste:", distancias["T"])
+
+coste_total += distancias["T"]
+posicion = "T"
+
+
+distancias, anteriores = dijkstra(grafo, posicion)
+ruta = obtener_ruta(anteriores, "D")
+
+print("\nT -> D")
+print("Ruta:", ruta)
+print("Coste:", distancias["D"])
+
+coste_total += distancias["D"]
+
+
+print("\nCoste total:", coste_total)
